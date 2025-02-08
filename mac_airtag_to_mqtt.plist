@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+        <key>Label</key>
+        <string>com.echoes341.mac_airtag_to_mqtt</string>
+        <key>ProgramArguments</key>
+        <array>
+          <string>/usr/local/bin/fdautil</string>
+          <string>exec</string>
+          <string>$REPOPATH/mac_airtag_to_mqtt</string>
+        </array>
+        <key>WorkingDirectory</key>
+        <string>$REPOPATH</string>
+        <key>StandardOutPath</key>
+        <string>$REPOPATH/stdout.log</string>
+        <key>StandardErrorPath</key>
+        <string>$REPOPATH/stderr.log</string>
+        <key>RunAtLoad</key>
+        <true/>
+        <key>KeepAlive</key>
+        <true/>
+    </dict>
+</plist>
