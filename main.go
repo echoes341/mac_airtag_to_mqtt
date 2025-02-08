@@ -61,7 +61,23 @@ func runMQTTClient(cfg Config) error {
 
 	publishHomeAssistantConfig(client, cfg.Topic)
 
+	tick := time.Tick(time.Minute)
+	changes, err := watcher(cfg)
+	if err != nil {
+		return err
+	}
+
 	for {
+		select {
+		case <-tick:
+			if debug {
+				fmt.Println("loop: tick")
+			}
+		case <-changes:
+			if debug {
+				fmt.Println("loop: watchfile")
+			}
+		}
 		if debug {
 			fmt.Printf("Reading airtags data from %s...\n", cfg.AirtagsDataFile)
 		}
@@ -78,8 +94,6 @@ func runMQTTClient(cfg Config) error {
 		for _, airtag := range airtags {
 			forwardLocation(client, cfg, airtag)
 		}
-
-		time.Sleep(30 * time.Second)
 	}
 }
 

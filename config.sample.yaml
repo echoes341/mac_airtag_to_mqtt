@@ -7,6 +7,8 @@ MQTT_PASSWORD: ''
 
 # User storing findmy info
 MAC_USER: ''
+# Optionally provide the full path of Items.data
+AIRTAGS_DATA_FILE: ''
 
 # Runtime config
 HOME_STREET_NAME: ''
