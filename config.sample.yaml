@@ -5,6 +5,9 @@ MQTT_TOPIC_NAME: apple
 MQTT_USERNAME: ''
 MQTT_PASSWORD: ''
 
+DEBUG: false
+
+HEALTHCHECK_ADDRESS: "localhost:8080"
 # User storing findmy info
 MAC_USER: ''
 # Optionally provide the full path of Items.data

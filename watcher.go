@@ -26,7 +26,7 @@ func watcher(cfg Config) (chan struct{}, error) {
 				if debug {
 					fmt.Println("watchfile event:", event)
 				}
-				if event.Has(fsnotify.Write) && event.Name == cfg.AirtagsDataFile {
+				if (event.Has(fsnotify.Write) || event.Has(fsnotify.Create)) && event.Name == cfg.AirtagsDataFile {
 					select {
 					// non-blocking send
 					case changed <- struct{}{}:

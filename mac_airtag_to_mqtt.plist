@@ -8,7 +8,7 @@
         <array>
           <string>/usr/local/bin/fdautil</string>
           <string>exec</string>
-          <string>$REPOPATH/mac_airtag_to_mqtt</string>
+          <string>$REPOPATH/mac-airtag-to-mqtt</string>
         </array>
         <key>WorkingDirectory</key>
         <string>$REPOPATH</string>

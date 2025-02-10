@@ -27,6 +27,10 @@ type Config struct {
 	Username  string `yaml:"MQTT_USERNAME,omitempty"`
 	Password  string `yaml:"MQTT_PASSWORD,omitempty"`
 
+	HealthcheckAddress string `yaml:"HEALTHCHECK_ADDRESS,omitempty"`
+
+	Debug bool `yaml:"DEBUG,omitempty"`
+
 	MacUser         string `yaml:"MAC_USER,omitempty"`
 	AirtagsDataFile string `yaml:"AIRTAGS_DATA_FILE,omitempty"`
 

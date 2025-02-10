@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
+	"sync/atomic"
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
@@ -30,21 +32,44 @@ func loadCfg() Config {
 }
 
 func main() {
-	flag.BoolVar(&debug, "debug", false, "Enable debug mode")
 	flag.StringVar(&configPath, "config", "config.yaml", "Path to the configuration file")
 	flag.Parse()
 
 	cfg := loadCfg()
+	debug = cfg.Debug
+
+	status := atomic.Bool{}
+
+	var lastErr atomic.Pointer[string]
+	lastErr.Store(&[]string{"not started yet"}[0])
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+		if !status.Load() {
+			w.WriteHeader(http.StatusServiceUnavailable)
+		} else {
+			w.WriteHeader(http.StatusOK)
+			w.Write([]byte(*lastErr.Load()))
+		}
+	})
+	go func() {
+		err := http.ListenAndServe(cfg.HealthcheckAddress, nil)
+		if err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+	}()
+
 	for {
-		if err := runMQTTClient(cfg); err != nil {
+		if err := runMQTTClient(cfg, &status); err != nil {
+			errStr := err.Error()
+			lastErr.Store(&errStr)
 			fmt.Printf("Error: %v\n", err)
 			fmt.Println("Waiting 15 seconds before retrying...")
+			status.Store(false)
 			time.Sleep(15 * time.Second)
 		}
 	}
 }
 
-func runMQTTClient(cfg Config) error {
+func runMQTTClient(cfg Config, status *atomic.Bool) error {
 	fmt.Printf("Connecting to MQTT broker at %s:%d...\n", cfg.Host, cfg.Port)
 
 	opts := MQTT.NewClientOptions()
@@ -61,10 +86,10 @@ func runMQTTClient(cfg Config) error {
 
 	publishHomeAssistantConfig(client, cfg.Topic)
 
-	tick := time.Tick(time.Minute)
+	tick := time.Tick(time.Minute / 2)
 	changes, err := watcher(cfg)
 	if err != nil {
-		return err
+		return fmt.Errorf("watchfile: %w", err)
 	}
 
 	for {
@@ -94,6 +119,7 @@ func runMQTTClient(cfg Config) error {
 		for _, airtag := range airtags {
 			forwardLocation(client, cfg, airtag)
 		}
+		status.Store(true)
 	}
 }
 
